@@ -1,5 +1,7 @@
 .vscode/
 *.code-workspace
+.dart_tool/
+.packages
 deprecated/
 *.bak
 build/*
