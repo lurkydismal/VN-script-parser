@@ -1,0 +1,13 @@
+label start {
+    "Hello";
+
+    $ _SayEx( ", World!" );
+
+    return;
+}
+
+label end {
+    "The end.";
+
+    # After this label player will be returned to main menu.
+}

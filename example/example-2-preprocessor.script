@@ -1,0 +1,63 @@
+define s = Character( [ name : "Sylvie", color : "#c8ffc8" ] ) (;
+
+default choice = false;
+
+label start {
+    s "Hello there!");
+
+    menu {
+        "The illusion of free choice...";
+        
+        "not even a choice" {
+            jump not_choice;
+        }
+        
+        "second choice" {
+            jump second_choice;
+        }
+    }
+}
+
+label not_choice {
+    $ choice = !choice;
+
+    if ( choice ) {
+        "true fron not";
+
+        $ _SayEx( "true" );
+
+    } if ( !choice ) {
+        "false from not";
+
+            ifdef isJavascript;
+                console.log( false );
+            endif
+
+            ifdef isDart;
+                print( false );
+            endif
+    } # There is no "else" flow control statement.
+
+    return;
+}
+
+label second_choice {
+    if ( choice ) {
+        "true from second";
+
+        $ _SayEx( "true" );
+
+    } if ( !choice ) {
+        "false from second";
+
+        ifdef isJavascript;
+            print( false );
+        endif;
+
+        ifdef isDart;
+            print( false );
+        endif;
+    } # There is no "else" flow control statement.
+
+    return;
+}

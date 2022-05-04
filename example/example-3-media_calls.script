@@ -1,0 +1,12 @@
+label start {
+    play music test;
+
+    scene bg lecturehall # You must not place ';' here
+    with fade;           # or it should be on the same line.
+
+    scene bg uni with fade;
+
+    $ sleep( 5 );
+
+    return;
+}

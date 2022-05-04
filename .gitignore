@@ -4,6 +4,6 @@
 .packages
 deprecated/
 *.bak
-build/*
+build/
 *.exe
 *.txt
