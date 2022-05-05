@@ -1,0 +1,5 @@
+ifdef isJavascript;
+    function print( text ) {
+        console.log( text );
+    }
+endif;

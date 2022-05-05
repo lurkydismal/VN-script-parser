@@ -1,7 +1,7 @@
 import "dart:io";
 import "dart:convert";
 
-int debugLevel = int.fromEnvironment("DEBUG", defaultValue: 0);
+int debugLevel = int.fromEnvironment("DEBUG", defaultValue: 4);
 String audioPath =
     String.fromEnvironment("AUDIO_PATH", defaultValue: "app/audio/");
 String fileScriptPath =
@@ -13,6 +13,7 @@ String fileAppPath = String.fromEnvironment("FILE_APP", defaultValue: "app.js");
 final Map<String, String> base64Cache = <String, String>{};
 final Map<String, String> defines = <String, String>{};
 final List<bool> myArray = <bool>[];
+final List<int> includeFilesLineCounter = <int>[];
 final File fileScript = File(fileScriptPath);
 final File fileScriptLog = File("${fileScriptPath}_log.txt");
 final File fileVariables = File(fileVariablesPath);
@@ -98,9 +99,6 @@ void preprocessLine() {
 
     log("value: \"$formattedLine\"", 2);
 
-    log("defines: \"${defines[formattedLine]}\"", 2);
-    log("toBool: \"${toBool(defines[formattedLine])}\"", 2);
-
     myArray.add(toBool(defines[formattedLine]));
 
     preprocessedLine = "";
@@ -110,6 +108,101 @@ void preprocessLine() {
     myArray.removeLast();
 
     preprocessedLine = "";
+
+  } else if (formattedLine.startsWith("include")) {
+    log("%include", 1);
+
+    var includePath = formattedLine.split(" ").last.replaceFirst(";", "");
+
+    log("value: \"$includePath\"", 2);
+
+    var includeFile = File( includePath );
+
+    FileSystemEntity.isDirectory( includePath )
+      .then((inputFileIsDirectory) {
+        if (inputFileIsDirectory) {
+          error("\"$includePath\" is directory.");
+        } else if (includeFile.existsSync()) {
+          includeFilesLineCounter.add(0);
+          var fileLines = includeFile.readAsLinesSync();
+          var formattedText = "";
+          var isCommentary = false;
+          var isNotTextSymbol = false;
+
+          for (var line in fileLines) {
+            includeFilesLineCounter[ includeFilesLineCounter.length - 1 ]++;
+
+            line = line.trim();
+            isCommentary = false;
+
+            if (line.isNotEmpty) {
+              for (final rune in line.runes) {
+                if (isCommentary) {
+                  continue;
+                }
+
+                var symbol = String.fromCharCode(rune);
+                formattedText += symbol;
+
+                isNotTextSymbol = ((formattedText.length > 1) &&
+                    (formattedText[formattedText.length - 2] == "\\"));
+
+                if (!isNotTextSymbol) {
+                  switch (symbol) {
+                    case "#":
+                      {
+                        formattedText = formattedText
+                            .replaceRange(formattedText.lastIndexOf("#"), null, "")
+                            .trim();
+
+                        isCommentary = true;
+
+                        break;
+                      }
+
+                    case "{":
+                    case "}":
+                    case ";":
+                      {
+                        formattedLine = formattedText.trim();
+
+                        if (debugLevel >= 5) {
+                          print(
+                              "${includeFilesLineCounter[ includeFilesLineCounter.length - 1 ]}: formattedText: \"$formattedLine \"");
+                        }
+
+                        preprocessLine();
+
+                        formattedText = "";
+
+                        if (preprocessedLine.isNotEmpty) {
+                          parseLine();
+                        }
+
+                        break;
+                      }
+                  }
+                }
+              }
+
+              if (formattedText.isNotEmpty) {
+                formattedText += " ";
+              }
+            }
+          }
+
+          includeFilesLineCounter.removeLast();
+
+          fileVariables
+              .writeAsStringSync("", mode: FileMode.writeOnlyAppend);
+
+        } else {
+          error("\"$includePath\" not found.");
+        }
+      });
+
+    preprocessedLine = "";
+
   } else if ((myArray.isNotEmpty) && (!myArray.last)) {
     log("%ifdef false", 3);
 
@@ -136,7 +229,6 @@ void preprocessLine() {
         final word = formattedWords[wordIndex].replaceFirst(";", "").trim();
 
         if (defines.containsKey(word)) {
-          print(lineCounter);
           formattedWords[wordIndex] = defines[word]!;
         }
       }
