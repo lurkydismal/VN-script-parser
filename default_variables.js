@@ -1,1 +1,0 @@
-var book = false;
