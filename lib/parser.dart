@@ -108,7 +108,6 @@ void preprocessLine() {
     myArray.removeLast();
 
     preprocessedLine = "";
-
   } else if (formattedLine.startsWith("include")) {
     log("%include", 1);
 
@@ -116,93 +115,90 @@ void preprocessLine() {
 
     log("value: \"$includePath\"", 2);
 
-    var includeFile = File( includePath );
+    var includeFile = File(includePath);
 
-    FileSystemEntity.isDirectory( includePath )
-      .then((inputFileIsDirectory) {
-        if (inputFileIsDirectory) {
-          error("\"$includePath\" is directory.");
-        } else if (includeFile.existsSync()) {
-          includeFilesLineCounter.add(0);
-          var fileLines = includeFile.readAsLinesSync();
-          var formattedText = "";
-          var isCommentary = false;
-          var isNotTextSymbol = false;
+    FileSystemEntity.isDirectory(includePath).then((inputFileIsDirectory) {
+      if (inputFileIsDirectory) {
+        error("\"$includePath\" is directory.");
+      } else if (includeFile.existsSync()) {
+        includeFilesLineCounter.add(0);
+        var fileLines = includeFile.readAsLinesSync();
+        var formattedText = "";
+        var isCommentary = false;
+        var isNotTextSymbol = false;
 
-          for (var line in fileLines) {
-            includeFilesLineCounter[ includeFilesLineCounter.length - 1 ]++;
+        for (var line in fileLines) {
+          includeFilesLineCounter[includeFilesLineCounter.length - 1]++;
 
-            line = line.trim();
-            isCommentary = false;
+          line = line.trim();
+          isCommentary = false;
 
-            if (line.isNotEmpty) {
-              for (final rune in line.runes) {
-                if (isCommentary) {
-                  continue;
-                }
-
-                var symbol = String.fromCharCode(rune);
-                formattedText += symbol;
-
-                isNotTextSymbol = ((formattedText.length > 1) &&
-                    (formattedText[formattedText.length - 2] == "\\"));
-
-                if (!isNotTextSymbol) {
-                  switch (symbol) {
-                    case "#":
-                      {
-                        formattedText = formattedText
-                            .replaceRange(formattedText.lastIndexOf("#"), null, "")
-                            .trim();
-
-                        isCommentary = true;
-
-                        break;
-                      }
-
-                    case "{":
-                    case "}":
-                    case ";":
-                      {
-                        formattedLine = formattedText.trim();
-
-                        if (debugLevel >= 5) {
-                          print(
-                              "${includeFilesLineCounter[ includeFilesLineCounter.length - 1 ]}: formattedText: \"$formattedLine \"");
-                        }
-
-                        preprocessLine();
-
-                        formattedText = "";
-
-                        if (preprocessedLine.isNotEmpty) {
-                          parseLine();
-                        }
-
-                        break;
-                      }
-                  }
-                }
+          if (line.isNotEmpty) {
+            for (final rune in line.runes) {
+              if (isCommentary) {
+                continue;
               }
 
-              if (formattedText.isNotEmpty) {
-                formattedText += " ";
+              var symbol = String.fromCharCode(rune);
+              formattedText += symbol;
+
+              isNotTextSymbol = ((formattedText.length > 1) &&
+                  (formattedText[formattedText.length - 2] == "\\"));
+
+              if (!isNotTextSymbol) {
+                switch (symbol) {
+                  case "#":
+                    {
+                      formattedText = formattedText
+                          .replaceRange(
+                              formattedText.lastIndexOf("#"), null, "")
+                          .trim();
+
+                      isCommentary = true;
+
+                      break;
+                    }
+
+                  case "{":
+                  case "}":
+                  case ";":
+                    {
+                      formattedLine = formattedText.trim();
+
+                      if (debugLevel >= 5) {
+                        print(
+                            "${includeFilesLineCounter[includeFilesLineCounter.length - 1]}: formattedText: \"$formattedLine \"");
+                      }
+
+                      preprocessLine();
+
+                      formattedText = "";
+
+                      if (preprocessedLine.isNotEmpty) {
+                        parseLine();
+                      }
+
+                      break;
+                    }
+                }
               }
             }
+
+            if (formattedText.isNotEmpty) {
+              formattedText += " ";
+            }
           }
-
-          includeFilesLineCounter.removeLast();
-
-          fileVariables
-              .writeAsStringSync("", mode: FileMode.writeOnlyAppend);
-
-        } else {
-          error("\"$includePath\" not found.");
         }
-      });
+
+        includeFilesLineCounter.removeLast();
+
+        fileVariables.writeAsStringSync("", mode: FileMode.writeOnlyAppend);
+      } else {
+        error("\"$includePath\" not found.");
+      }
+    });
 
     preprocessedLine = "";
-
   } else if ((myArray.isNotEmpty) && (!myArray.last)) {
     log("%ifdef false", 3);
 
