@@ -16,7 +16,7 @@ endif;
 label start {
 
     # Start by playing some music.
-    play music test;
+    play music base64 test;
 
     scene bg lecturehall
     with fade;

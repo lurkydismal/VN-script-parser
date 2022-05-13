@@ -102,6 +102,16 @@ void preprocessLine() {
     myArray.add(toBool(defines[formattedLine]));
 
     preprocessedLine = "";
+  } else if (formattedLine.startsWith("ifndef ")) {
+    log("%ifndef", 1);
+
+    formattedLine = formattedLine.split(" ").last.replaceFirst(";", "");
+
+    log("value: \"$formattedLine\"", 2);
+
+    myArray.add(!toBool(defines[formattedLine]));
+
+    preprocessedLine = "";
   } else if (formattedLine.startsWith("endif")) {
     log("%endif", 1);
 
@@ -337,6 +347,24 @@ void parseLine() {
 
       fileApp.writeAsStringSync(preprocessedLine,
           mode: FileMode.writeOnlyAppend);
+    } else if (preprocessedLine.startsWith("\$JS")) {
+      log("@\$JS", 1);
+
+      preprocessedLine = preprocessedLine.replaceFirst("\$JS", "").trim();
+
+      if (toBool(defines["isJavascript"])) {
+        fileApp.writeAsStringSync(preprocessedLine,
+            mode: FileMode.writeOnlyAppend);
+      }
+    } else if (preprocessedLine.startsWith("\$D")) {
+      log("@\$D", 1);
+
+      preprocessedLine = preprocessedLine.replaceFirst("\$D", "").trim();
+
+      if (toBool(defines["isDart"])) {
+        fileApp.writeAsStringSync(preprocessedLine,
+            mode: FileMode.writeOnlyAppend);
+      }
     } else if (preprocessedLine.startsWith("label ")) {
       log("@label", 1);
 

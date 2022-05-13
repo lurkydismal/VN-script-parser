@@ -50,13 +50,9 @@ label second_choice {
     } if ( !choice ) {
         "false from second";
 
-        ifdef isJavascript;
-            print( false );
-        endif;
+        $JS print( false );
 
-        ifdef isDart;
-            print( false );
-        endif;
+        $D print( false );
     } # There is no "else" flow control statement.
 
     return;
