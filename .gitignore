@@ -6,4 +6,6 @@ deprecated/
 *.bak
 build/
 *.exe
+*.aot
+*.jit
 *.txt

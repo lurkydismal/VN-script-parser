@@ -1,7 +1,7 @@
 import "dart:io";
 import "dart:convert";
 
-int debugLevel = int.fromEnvironment("DEBUG", defaultValue: 4);
+int debugLevel = int.fromEnvironment("DEBUG", defaultValue: 0);
 String audioPath =
     String.fromEnvironment("AUDIO_PATH", defaultValue: "app/audio/");
 String fileScriptPath =
