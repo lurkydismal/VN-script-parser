@@ -434,7 +434,7 @@ void parseLine() {
           .trim();
       log("value: \"$preprocessedLine\"", 3);
 
-      fileApp.writeAsStringSync("_Say( $preprocessedLine );",
+      fileApp.writeAsStringSync("await _Say( $preprocessedLine );",
           mode: FileMode.writeOnlyAppend);
     } else if (preprocessedLine.startsWith("...")) {
       log("@...", 1);
@@ -445,7 +445,7 @@ void parseLine() {
           .trim();
       log("value: \"$preprocessedLine\"", 3);
 
-      fileApp.writeAsStringSync("_SayEx( $preprocessedLine );",
+      fileApp.writeAsStringSync("await _SayEx( $preprocessedLine );",
           mode: FileMode.writeOnlyAppend);
     } else if (preprocessedLine.startsWith("scene ")) {
       log("@scene", 1);
@@ -506,10 +506,10 @@ void parseLine() {
       log("value: $words", 3);
 
       if (words.contains("sound")) {
-        type = "SOUND";
+        type = "sound";
         log("type changed: $type", 3);
       } else if (words.contains("music")) {
-        type = "MUSIC";
+        type = "sound";
         log("type changed: $type", 3);
       }
 
@@ -558,7 +558,7 @@ void parseLine() {
         log("function changed: $function", 3);
       }
 
-      fileApp.writeAsStringSync("$function( MediaType.$type$file );",
+      fileApp.writeAsStringSync("$function( media_t.$type$file );",
           mode: FileMode.writeOnlyAppend);
 
       // } else if ( preprocessedLine.startsWith( "code" ) ) {
