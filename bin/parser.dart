@@ -1,5 +1,32 @@
 import "dart:io";
 
+// Copyright 2013, the Dart project authors.
+
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are
+// met:
+
+//     * Redistributions of source code must retain the above copyright
+//       notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above
+//       copyright notice, this list of conditions and the following
+//       disclaimer in the documentation and/or other materials provided
+//       with the distribution.
+//     * Neither the name of Google LLC nor the names of its
+//       contributors may be used to endorse or promote products derived
+//       from this software without specific prior written permission.
+
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import "package:args/args.dart";
 
 import "package:parser/parser.dart" as script_parser;
@@ -11,50 +38,57 @@ void main(List<String> arguments) {
     ..addOption(
       "debug",
       abbr: "d",
-      defaultsTo: script_parser.debugLevel.toString(),
       callback: (String? level) => script_parser.debugLevel =
           (int.tryParse(level ?? "null") ?? script_parser.debugLevel),
-      allowed: ["1", "2", "3", "4"],
+      allowed: ["0", "1", "2", "3", "4"],
     )
     ..addOption(
       "assets",
-      abbr: "a",
-      defaultsTo: script_parser.audioPath,
-      callback: (String? path) =>
-          script_parser.audioPath = (path ?? script_parser.audioPath),
+      callback: (String? path) {
+        if (path != null) {
+          script_parser.audioPath = path;
+        }
+      },
     )
     ..addOption(
       "in",
       abbr: "i",
-      defaultsTo: script_parser.fileScriptPath,
-      callback: (String? path) =>
-          script_parser.fileScriptPath = (path ?? script_parser.audioPath),
+      callback: (String? path) {
+        if (path != null) {
+          script_parser.fileScriptPath = path;
+        }
+      },
     )
     ..addOption(
       "out",
       abbr: "o",
-      defaultsTo: script_parser.fileAppPath,
-      callback: (String? path) =>
-          script_parser.fileAppPath = (path ?? script_parser.audioPath),
+      callback: (String? path) {
+        if (path != null) {
+          script_parser.fileAppPath = path;
+        }
+      },
     )
     ..addOption(
       "log",
-      abbr: "l",
+      callback: (String? path) {
+        if (path != null) {
+          script_parser.fileScriptLog = File(path);
+        }
+      },
     )
-    ..addFlag("native", negatable: true, callback: (isNative) {
-      script_parser.defines["isJavascript"] = (!isNative).toString();
-      script_parser.defines["isDart"] = isNative.toString();
+    ..addFlag("native", negatable: true, callback: (bool? isNative) {
+      if (isNative != null) {
+        script_parser.defines["isJavascript"] = (!isNative).toString();
+        script_parser.defines["isDart"] = isNative.toString();
+      }
     })
-    ..addFlag("help", negatable: false, callback: (printHelp) {
-      if (printHelp) {
+    ..addFlag("help", negatable: false, callback: (bool? printHelp) {
+      if ((printHelp != null) && (printHelp)) {
         print(argumentParser.usage);
       }
     });
 
-  final results = argumentParser.parse(arguments);
-
-  final logScript = File(results["log"] ?? "log.txt");
-  final logScriptExists = logScript.existsSync();
+  argumentParser.parse(arguments);
 
   if (script_parser.debugLevel >= 1) {
     script_parser.fileScriptLog.writeAsStringSync("");
@@ -120,9 +154,7 @@ void main(List<String> arguments) {
 
                     formattedText = "";
 
-                    if (logScriptExists) {
-                      formattedLines.add(script_parser.preprocessedLine);
-                    }
+                    formattedLines.add(script_parser.preprocessedLine);
 
                     if (script_parser.preprocessedLine.isNotEmpty) {
                       script_parser.parseLine();
@@ -142,17 +174,6 @@ void main(List<String> arguments) {
 
       script_parser.fileVariables
           .writeAsStringSync("", mode: FileMode.writeOnlyAppend);
-
-      if (logScriptExists) {
-        final trustLogScript = logScript;
-
-        trustLogScript.writeAsStringSync("");
-
-        for (final line in formattedLines) {
-          trustLogScript.writeAsStringSync("$line\n",
-              mode: FileMode.writeOnlyAppend);
-        }
-      }
     } else {
       script_parser.error("\"${script_parser.fileScriptPath}\" not found.");
     }

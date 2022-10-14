@@ -1,7 +1,7 @@
 import "dart:io";
 import "dart:convert";
 
-int debugLevel = int.fromEnvironment("DEBUG", defaultValue: 0);
+int debugLevel = int.fromEnvironment("DEBUG", defaultValue: 4);
 String audioPath =
     String.fromEnvironment("AUDIO_PATH", defaultValue: "app/audio/");
 String fileScriptPath =
@@ -9,13 +9,14 @@ String fileScriptPath =
 String fileVariablesPath = String.fromEnvironment("FILE_VARIABLES",
     defaultValue: "default_variables.js");
 String fileAppPath = String.fromEnvironment("FILE_APP", defaultValue: "app.js");
+File fileScriptLog = File(String.fromEnvironment("FILE_LOG",
+    defaultValue: "${fileScriptPath}_log.txt"));
 
 final Map<String, String> base64Cache = <String, String>{};
 final Map<String, String> defines = <String, String>{};
 final List<bool> myArray = <bool>[];
 final List<int> includeFilesLineCounter = <int>[];
 final File fileScript = File(fileScriptPath);
-final File fileScriptLog = File("${fileScriptPath}_log.txt");
 final File fileVariables = File(fileVariablesPath);
 final File fileApp = File(fileAppPath);
 late String formattedLine;
@@ -23,8 +24,6 @@ late String preprocessedLine;
 int lineCounter = 0;
 int codeBracketCount = 0;
 int menuBracketCount = 0;
-bool isJavascript = false;
-bool isDart = false;
 Object? lastCalledFunction;
 
 void error(errorText) => print("Error: $errorText");
@@ -42,8 +41,16 @@ bool stringIsBase64(final String text) {
   log(null, 1);
 
   log("text string: $text", 3);
-  final textIsBase64 = (((text.length % 4) == 0) &&
-      ((text.lastIndexOf("=") - text.indexOf("=")) == 1));
+  late final bool textIsBase64;
+
+  try {
+    base64Decode(text);
+
+    textIsBase64 = true;
+  } catch (_) {
+    textIsBase64 = false;
+  }
+
   log("isBase64: $textIsBase64", 3);
 
   return (textIsBase64);
@@ -62,8 +69,8 @@ String fileToBase64(final String filePath) {
   return (base64);
 }
 
-bool isAlpha(String text) {
-  lastCalledFunction = isAlpha;
+bool isAlphaOrUnderscore(String text) {
+  lastCalledFunction = isAlphaOrUnderscore;
   log(null, 1);
 
   return (!text.contains(RegExp("[^A-Za-z_]")));
@@ -74,6 +81,10 @@ bool toBool(Object? object) {
 
   if ((object == null) || (objectAsString.isEmpty)) {
     return (false);
+  } else if (object is List<dynamic>) {
+    return (object.isNotEmpty);
+  } else if (object is Map<dynamic, dynamic>) {
+    return (object.isNotEmpty);
   }
 
   var objectAsDouble = double.tryParse(objectAsString);
@@ -92,6 +103,9 @@ bool toBool(Object? object) {
 }
 
 void preprocessLine() {
+  lastCalledFunction = preprocessLine;
+  log(null, 1);
+
   if (formattedLine.startsWith("ifdef ")) {
     log("%ifdef", 1);
 
@@ -216,9 +230,6 @@ void preprocessLine() {
 
     preprocessedLine = "";
   } else if (codeBracketCount == 0) {
-    lastCalledFunction = preprocessLine;
-    log(null, 1);
-
     log("line: \"$formattedLine\"", 4);
 
     var isNotText = true;
@@ -565,7 +576,6 @@ void parseLine() {
       //     log( "@code", 1 );
 
       //     codeBracketCount = 1;
-
     } else if (preprocessedLine.startsWith("menu")) {
       log("@menu", 1);
 
