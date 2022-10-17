@@ -118,19 +118,19 @@ void main() {
     });
 
     test("Map { 1 : 1 }", () {
-      expect(toBool({1 : 1}), true);
+      expect(toBool({1: 1}), true);
     });
 
     test("Map { 1 : 1, 2 : 2 }", () {
-      expect(toBool({1 : 1, 2 : 2}), true);
+      expect(toBool({1: 1, 2: 2}), true);
     });
 
     test("Map { \"1\" : \"1\" }", () {
-      expect(toBool({"1" : "1"}), true);
+      expect(toBool({"1": "1"}), true);
     });
 
     test("Map { \"1\" : \"1\", \"2\" : \"2\" }", () {
-      expect(toBool({"1" : "1", "2" : "2"}), true);
+      expect(toBool({"1": "1", "2": "2"}), true);
     });
   });
 }

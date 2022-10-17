@@ -429,7 +429,7 @@ void parseLine() {
           .trim();
       log("value: \"$preprocessedLine\"", 2);
 
-      fileApp.writeAsStringSync("$preprocessedLine( _resolve );",
+      fileApp.writeAsStringSync("await $preprocessedLine( _resolve );",
           mode: FileMode.writeOnlyAppend);
     } else if (preprocessedLine.startsWith("return;")) {
       log("@return", 1);
