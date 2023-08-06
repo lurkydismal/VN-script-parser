@@ -1,5 +1,7 @@
 # VN-script-parser
 
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/8a84676db42c49f1b8f3c69ac38e87e6)](https://app.codacy.com/gh/lurkydismal/VN-script-parser/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+
 > [_Visual Novel engine_](https://github.com/lurkydismal/VN-engine-web) script language parser.
 
 ## Table of Contents
