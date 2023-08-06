@@ -1,5 +1,5 @@
 name: parser
-description: Visual Novel engine ( https://github.com/lurkydismal/VN-engine-web ) script language parser.
+description: Visual Novel engine script language parser.
 version: 1.0.2
 homepage: https://github.com/lurkydismal/VN-script-parser
 
@@ -9,6 +9,5 @@ environment:
 dev_dependencies:
   lints: ^2.1.1
   test: ^1.24.5
-
-dependencies: 
+dependencies:
   args: ^2.4.2
