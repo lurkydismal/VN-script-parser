@@ -26,8 +26,6 @@
 
 ## Setup
 
-> Upgrade packages by running  
-
 ```console
 dart pub upgrade
 ```
