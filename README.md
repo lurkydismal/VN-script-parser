@@ -14,7 +14,7 @@
 
 ## Technologies Used
 
-* args - version 2.3.1
+* args - Dart package
 
 ## Features
 
@@ -25,7 +25,10 @@
 ## Setup
 
 > Upgrade packages by running  
-`dart pub upgrade`
+
+```console
+dart pub upgrade
+```
 
 ## Project Status
 
