@@ -26,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dart_version: [stable, beta, dev, main]
+        dart_version: [beta, dev, main]
         os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
@@ -46,7 +46,7 @@ jobs:
             sdk: ${{ matrix.dart_version }}
 
       - name: Install dependencies
-        run: dart pub get -v
+        run: dart pub get
 
       # Uncomment this step to verify the use of 'dart format' on each commit.
       - name: Verify formatting
